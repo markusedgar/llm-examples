@@ -8,7 +8,7 @@ openai.api_key = 'your-openai-api-key-here'
 st.sidebar.title("Settings")
 model = st.sidebar.selectbox(
     "Select Generative AI Model",
-    ["text-davinci-003", "text-curie-001", "text-babbage-001", "text-ada-001"]
+    ["gpt-3.5-turbo", "gpt-4"]
 )
 
 # Main form
@@ -19,12 +19,15 @@ with st.form(key='genai_form'):
 
 if submit_button:
     if prompt:
-        response = openai.Completion.create(
-            engine=model,
-            prompt=prompt,
+        response = openai.ChatCompletion.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
             max_tokens=150
         )
         st.write("Response from OpenAI:")
-        st.write(response.choices[0].text.strip())
+        st.write(response.choices[0].message['content'].strip())
     else:
         st.warning("Please enter a prompt.")
