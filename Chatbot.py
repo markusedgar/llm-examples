@@ -20,7 +20,7 @@ def get_openai_response(prompt, model):
 st.title("OpenAI Prompt Generator")
 
 prompt = st.text_area("Enter your prompt:", height=200)
-model = st.selectbox("Select the model = st.selectbox("Select the model:", ["gpt-4", "gpt-3.5-turbo", "gpt-3.5"]))
+model = st.selectbox("Select the model:", ["gpt-4", "gpt-3.5-turbo", "gpt-3.5"])
 
 if st.button("Generate Response"):
     if prompt and model:
