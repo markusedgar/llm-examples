@@ -1,9 +1,7 @@
 import streamlit as st
 import openai
 
-# Set your OpenAI API key here
-openai.api_key = 'your-openai-api-key-here'
-
+openai.api_key = st.secrets["openai_api_key"]
 # Sidebar for settings
 st.sidebar.title("Settings")
 model = st.sidebar.selectbox(
