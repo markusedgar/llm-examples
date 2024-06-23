@@ -1,29 +1,30 @@
-from openai import OpenAI
 import streamlit as st
+import openai
 
-with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
-#    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-#    "[View the source code](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py)"
-#   "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
+# Set your OpenAI API key here
+openai.api_key = 'your-openai-api-key-here'
 
-st.title("💬 Chatbot")
-st.caption("🚀 A Streamlit chatbot powered by OpenAI")
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+# Sidebar for settings
+st.sidebar.title("Settings")
+model = st.sidebar.selectbox(
+    "Select Generative AI Model",
+    ["text-davinci-003", "text-curie-001", "text-babbage-001", "text-ada-001"]
+)
 
-for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+# Main form
+st.title("Generative AI Prompt Form")
+with st.form(key='genai_form'):
+    prompt = st.text_area("Enter your prompt here:")
+    submit_button = st.form_submit_button(label='Generate')
 
-if prompt := st.chat_input():
-    if not openai_api_key:
-        st.info("Please add your OpenAI API key to continue.")
-        st.stop()
-
-    client = OpenAI(api_key=openai_api_key)
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
-    response = client.chat.completions.create(model="gpt-3.5-turbo", messages=st.session_state.messages)
-    msg = response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": msg})
-    st.chat_message("assistant").write(msg)
+if submit_button:
+    if prompt:
+        response = openai.Completion.create(
+            engine=model,
+            prompt=prompt,
+            max_tokens=150
+        )
+        st.write("Response from OpenAI:")
+        st.write(response.choices[0].text.strip())
+    else:
+        st.warning("Please enter a prompt.")
