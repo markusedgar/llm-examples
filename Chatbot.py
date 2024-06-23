@@ -7,17 +7,20 @@ import openai
 
 def get_openai_response(prompt, model):
     openai.api_key = st.secrets["OpenAI"]["openai_api_key"]
-    response = openai.Completion.create(
-        engine=model,
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
         max_tokens=150
     )
-    return response.choices[0].text.strip()
+    return response.choices[0].message['content'].strip()
 
 st.title("OpenAI Prompt Generator")
 
 prompt = st.text_area("Enter your prompt:", height=200)
-model = st.selectbox("Select the model:", ["davinci", "curie", "babbage", "ada"])
+model = st.selectbox("Select the model = st.selectbox("Select the model:", ["gpt-4", "gpt-3.5-turbo", "gpt-3.5"]))
 
 if st.button("Generate Response"):
     if prompt and model:
