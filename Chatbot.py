@@ -2,17 +2,22 @@ import streamlit as st
 import os
 from openai import OpenAI
 
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=st.secrets["OpenAI"]["openai_api_key"]
+)
+
+
 # Everything is accessible via the st.secrets dict:
 # st.write("A cool secret:", st.secrets["OpenAI"]["openai_api_key"])
 
 def get_openai_response(prompt, model):
-    openai.api_key = st.secrets["OpenAI"]["openai_api_key"]
-    response = openai.ChatCompletion.create(
-        model=model,
+    response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ],
+        model=model,
         max_tokens=150
     )
     return response.choices[0].message['content'].strip()
