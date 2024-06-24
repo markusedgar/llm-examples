@@ -7,7 +7,7 @@ client = OpenAI(
     api_key=st.secrets["OpenAI"]["openai_api_key"]
 )
 
-models = client.Model.list()
+models = openai.Model.list()
 st.write("Available models: ", models)
 
 
