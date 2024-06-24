@@ -21,7 +21,7 @@ def get_openai_response(prompt, model):
         max_tokens=150
     )
 
-    response_content = response['choices'][0]['message']['content']
+    response_content = response
     print(response_content)
 
     return 'fun stuff'
