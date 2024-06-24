@@ -21,10 +21,7 @@ def get_openai_response(prompt, model):
         max_tokens=150
     )
 
-    response_content = response
-    print(response_content)
-
-    return response
+    return response.choices[0].message.content
 
     # return response['choices'][0]['text'].strip()
 
