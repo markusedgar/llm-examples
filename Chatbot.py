@@ -20,8 +20,13 @@ def get_openai_response(prompt, model):
         model=model,
         max_tokens=150
     )
-    return response['choices'][0]['text'].strip()
 
+    response_content = response['choices'][0]['message']['content']
+    print(response_content)
+
+    return 'fun stuff'
+
+    # return response['choices'][0]['text'].strip()
 
 st.title("OpenAI Prompt Generator")
 
