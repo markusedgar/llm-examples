@@ -7,6 +7,9 @@ client = OpenAI(
     api_key=st.secrets["OpenAI"]["openai_api_key"]
 )
 
+models = client.Model.list()
+st.write("Available models: ", models)
+
 
 # Everything is accessible via the st.secrets dict:
 # st.write("A cool secret:", st.secrets["OpenAI"]["openai_api_key"])
