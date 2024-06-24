@@ -12,8 +12,6 @@ client = OpenAI(
 # st.write("A cool secret:", st.secrets["OpenAI"]["openai_api_key"])
 
 def get_openai_response(prompt, model):
-    print(prompt)
-    print(model)
     response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
@@ -26,7 +24,7 @@ def get_openai_response(prompt, model):
     response_content = response
     print(response_content)
 
-    return 'fun stuff'
+    return response
 
     # return response['choices'][0]['text'].strip()
 
