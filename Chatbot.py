@@ -7,8 +7,8 @@ client = OpenAI(
     api_key=st.secrets["OpenAI"]["openai_api_key"]
 )
 
-models = client.models.list()
-st.write("Available models: ", models)
+# models = client.models.list()
+# st.write("Available models: ", models)
 
 
 # Everything is accessible via the st.secrets dict:
@@ -31,7 +31,7 @@ def get_openai_response(prompt, model):
 st.title("OpenAI Prompt Generator")
 
 prompt = st.text_area("Enter your prompt:", height=200)
-model = st.selectbox("Select the model:", ["gpt-4", "gpt-3.5-turbo", "gpt-3.5"])
+model = st.selectbox("Select the model:", ["gpt-4o", "gpt-4", "gpt-3.5-turbo"])
 
 if st.button("Generate Response"):
     if prompt and model:
