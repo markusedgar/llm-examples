@@ -3,7 +3,8 @@ import os
 from openai import OpenAI
 import requests
 
-API_URL = "https://wpx-flowise.onrender.com/api/v1/prediction/00172756-ba9d-432b-bd8d-936f0478d63f"
+API_URL = st.secrets["Flowise"]["flowise_usecase_api_key"]
+
 
 def get_flowise_response(prompt, model):
     response = requests.post(API_URL, json={
