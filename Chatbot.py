@@ -1,6 +1,37 @@
 import streamlit as st
-import pandas as pd
-import io
+import requests
+
+# Configuration for allowed file types
+ALLOWED_EXTENSIONS = ['jpg', 'txt', 'png', 'gif', 'bmp']
+
+def is_allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def send_to_api(text_prompt, files, action):
+    # This is a placeholder for the API call
+    # In a real application, you would replace this with actual API logic
+    api_url = "https://api.example.com/submit"  # Replace with your actual API endpoint
+
+    # Prepare the data to send
+    data = {
+        "text_prompt": text_prompt,
+        "action": action
+    }
+
+    files_data = []
+    for file in files:
+        files_data.append(("files", file))
+
+    # In a real scenario, you might use requests.post() to send data to the API
+    # For now, we'll just print what would be sent
+    st.write("Data that would be sent to the API:")
+    st.json(data)
+    st.write("Files that would be uploaded:")
+    for file in files:
+        st.write(file.name)
+
+    # Simulated API response
+    return {"status": "success", "message": "Data received successfully"}
 
 def main():
     st.title("File Upload and Processing App")
@@ -8,46 +39,35 @@ def main():
     # Text prompt
     text_prompt = st.text_area("Enter your text prompt here:", height=150)
 
-    # File upload
-    allowed_extensions = ['csv', 'txt', 'xlsx']
-    uploaded_files = st.file_uploader("Choose files", accept_multiple_files=True, type=allowed_extensions)
+    # File upload with type filtering
+    uploaded_files = st.file_uploader("Choose files", accept_multiple_files=True, type=ALLOWED_EXTENSIONS)
+
+    # Display allowed file types
+    st.write(f"Allowed file types: {', '.join(ALLOWED_EXTENSIONS)}")
 
     # Action selection
     action = st.selectbox(
         "Select an action to perform on the data:",
-        ["View Data", "Analyze Data", "Transform Data"]
+        ["Process", "Analyze", "Transform"]
     )
 
-    if uploaded_files and action:
-        st.write(f"You've selected to {action.lower()} the uploaded files.")
+    # Submit button
+    if st.button("Submit"):
+        if uploaded_files:
+            # Filter out any files that don't meet the criteria (extra precaution)
+            valid_files = [file for file in uploaded_files if is_allowed_file(file.name)]
 
-        for file in uploaded_files:
-            file_extension = file.name.split('.')[-1]
+            if len(valid_files) != len(uploaded_files):
+                st.warning(f"Some files were ignored due to unsupported file types. {len(valid_files)} out of {len(uploaded_files)} files will be processed.")
 
-            if file_extension == 'csv':
-                df = pd.read_csv(file)
-            elif file_extension == 'xlsx':
-                df = pd.read_excel(file)
-            elif file_extension == 'txt':
-                content = file.getvalue().decode('utf-8')
-                st.text_area(f"Content of {file.name}", content, height=200)
-                continue
+            # Call the API (placeholder function)
+            response = send_to_api(text_prompt, valid_files, action)
 
-            if action == "View Data":
-                st.write(f"Preview of {file.name}:")
-                st.write(df.head())
-            elif action == "Analyze Data":
-                st.write(f"Analysis of {file.name}:")
-                st.write(df.describe())
-            elif action == "Transform Data":
-                st.write(f"Transformed {file.name} (showing first 5 rows with doubled numeric values):")
-                numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns
-                df[numeric_columns] = df[numeric_columns] * 2
-                st.write(df.head())
-
-    if text_prompt:
-        st.write("Your text prompt:")
-        st.write(text_prompt)
+            # Display the API response
+            st.write("API Response:")
+            st.json(response)
+        else:
+            st.warning("Please upload at least one file before submitting.")
 
 if __name__ == "__main__":
     main()
