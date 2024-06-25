@@ -10,7 +10,7 @@ def get_flowise_response(prompt, model):
         "question": prompt,
     })
     # We are not yet using the model parameter
-    return response.json()
+    return response.json()["text"]
 
 client = OpenAI(
     # This is the default and can be omitted
