@@ -1,54 +1,53 @@
 import streamlit as st
-import os
-from openai import OpenAI
-import requests
+import pandas as pd
+import io
 
-API_URL = st.secrets["Flowise"]["flowise_usecase_api_key"]
+def main():
+    st.title("File Upload and Processing App")
 
+    # Text prompt
+    text_prompt = st.text_area("Enter your text prompt here:", height=150)
 
-def get_flowise_response(prompt, model):
-    response = requests.post(API_URL, json={
-        "question": prompt,
-    })
-    # We are not yet using the model parameter
-    return response.json()["text"]
+    # File upload
+    allowed_extensions = ['csv', 'txt', 'xlsx']
+    uploaded_files = st.file_uploader("Choose files", accept_multiple_files=True, type=allowed_extensions)
 
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=st.secrets["OpenAI"]["openai_api_key"]
-)
-
-# models = client.models.list()
-# st.write("Available models: ", models)
-
-
-# Everything is accessible via the st.secrets dict:
-# st.write("A cool secret:", st.secrets["OpenAI"]["openai_api_key"])
-
-def get_openai_response(prompt, model):
-    response = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        model=model,
-        max_tokens=150
+    # Action selection
+    action = st.selectbox(
+        "Select an action to perform on the data:",
+        ["View Data", "Analyze Data", "Transform Data"]
     )
 
-    return response.choices[0].message.content
+    if uploaded_files and action:
+        st.write(f"You've selected to {action.lower()} the uploaded files.")
 
-    # return response['choices'][0]['text'].strip()
+        for file in uploaded_files:
+            file_extension = file.name.split('.')[-1]
 
+            if file_extension == 'csv':
+                df = pd.read_csv(file)
+            elif file_extension == 'xlsx':
+                df = pd.read_excel(file)
+            elif file_extension == 'txt':
+                content = file.getvalue().decode('utf-8')
+                st.text_area(f"Content of {file.name}", content, height=200)
+                continue
 
+            if action == "View Data":
+                st.write(f"Preview of {file.name}:")
+                st.write(df.head())
+            elif action == "Analyze Data":
+                st.write(f"Analysis of {file.name}:")
+                st.write(df.describe())
+            elif action == "Transform Data":
+                st.write(f"Transformed {file.name} (showing first 5 rows with doubled numeric values):")
+                numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns
+                df[numeric_columns] = df[numeric_columns] * 2
+                st.write(df.head())
 
-st.title("OpenAI Prompt Generator")
+    if text_prompt:
+        st.write("Your text prompt:")
+        st.write(text_prompt)
 
-prompt = st.text_area("Enter your prompt:", height=200)
-model = st.selectbox("Select the model:", ["gpt-4o", "gpt-4", "gpt-3.5-turbo"])
-
-if st.button("Generate Response"):
-    if prompt and model:
-        response = get_flowise_response(prompt, model)
-        st.write("Response from OpenAI:", response)
-    else:
-        st.write("Please enter a prompt and select a model.")
+if __name__ == "__main__":
+    main()
